@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Store } from '@ngrx/store';
 
 import { Subscription } from 'rxjs';
 
@@ -22,7 +23,10 @@ export class ProductListComponent implements OnInit, OnDestroy {
   selectedProduct: Product | null;
   sub: Subscription;
 
-  constructor(private productService: ProductService) { }
+  constructor(
+    private productService: ProductService,
+    private store: Store<any>
+  ) { }
 
   ngOnInit(): void {
     this.sub = this.productService.selectedProductChanges$.subscribe(
@@ -33,6 +37,16 @@ export class ProductListComponent implements OnInit, OnDestroy {
       next: (products: Product[]) => this.products = products,
       error: err => this.errorMessage = err
     });
+
+    // TODO Unsubscribe
+    this.store.select('products')
+      .subscribe(
+        products => {
+          if (products) {
+            this.displayCode = products.showProductCode;
+          }
+        }
+      )
   }
 
   ngOnDestroy(): void {
@@ -40,7 +54,9 @@ export class ProductListComponent implements OnInit, OnDestroy {
   }
 
   checkChanged(): void {
-    this.displayCode = !this.displayCode;
+    this.store.dispatch(
+      {type: '[Product] Toggle Product Code'}
+    );
   }
 
   newProduct(): void {
