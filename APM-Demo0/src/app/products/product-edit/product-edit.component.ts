@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Product } from '../product';
@@ -133,14 +133,11 @@ export class ProductEditComponent implements OnInit {
 
         if (product.id === 0) {
           this.productService.createProduct(product).subscribe({
-            next: p => this.store.dispatch(ProductAction.setCurrentProduct({ product: p })),
+            next: p => this.store.dispatch(ProductAction.setCurrentProduct({ currentProductId: p.id })),
             error: err => this.errorMessage = err
           });
         } else {
-          this.productService.updateProduct(product).subscribe({
-            next: p => this.store.dispatch(ProductAction.setCurrentProduct({ product: p })),
-            error: err => this.errorMessage = err
-          });
+          this.store.dispatch(ProductAction.updateProduct({ product }));
         }
       }
     }
